@@ -1,0 +1,45 @@
+accelerator:
+  displayName: JavaScript Frontend Sample
+  description: A sample for a JavaScript App using Web Servers buildpack
+  iconUrl: https://upload.wikimedia.org/wikipedia/commons/6/6a/JavaScript-logo.png
+  tags:
+  - javascript
+  - tanzu
+
+  # options for the UI
+  options:
+  - name: deploymentType
+    inputType: select
+    choices:
+    - value: workload
+      text: TAP workload
+    - value: none
+      text: Skip deployment configuration
+    defaultValue: workload
+    required: true
+
+engine:
+  merge:
+    - include: [ "**" ]
+      exclude: [ "config/**", "catalog/**", "DEPLOYING.md", ".github/**" ]
+    - include: [ "config/workload.yaml" ]
+      condition: "#deploymentType == 'workload'"
+      chain:
+      - type: ReplaceText
+        substitutions:
+        - text: ": javascript-frontend-sample"
+          with: "': ' + #artifactId.toLowerCase()"
+    - include: [ "catalog/*.yaml" ]
+      condition: "#deploymentType == 'workload'"
+      chain:
+      - type: ReplaceText
+        substitutions:
+        - text: javascript-frontend-sample
+          with: "#artifactId.toLowerCase()"
+    - include: [ "DEPLOYING.md" ]
+      condition: "#deploymentType == 'workload'"
+      chain:
+      - type: ReplaceText
+        substitutions:
+        - text: javascript-frontend-sample
+          with: "#artifactId.toLowerCase()"
